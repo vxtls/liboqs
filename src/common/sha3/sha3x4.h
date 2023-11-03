@@ -18,6 +18,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <oqs/common.h>
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -255,6 +257,97 @@ void OQS_SHA3_shake256_x4_inc_ctx_clone(
  */
 void OQS_SHA3_shake256_x4_inc_ctx_reset(OQS_SHA3_shake256_x4_inc_ctx *state);
 
+struct OQS_SHA3_x4_callbacks {
+	void (*SHA3_shake128_x4)(
+	    uint8_t *out0,
+	    uint8_t *out1,
+	    uint8_t *out2,
+	    uint8_t *out3,
+	    size_t outlen,
+	    const uint8_t *in0,
+	    const uint8_t *in1,
+	    const uint8_t *in2,
+	    const uint8_t *in3,
+	    size_t inlen);
+
+	void (*SHA3_shake128_x4_inc_init)(OQS_SHA3_shake128_x4_inc_ctx *state);
+
+	void (*SHA3_shake128_x4_inc_absorb)(
+	    OQS_SHA3_shake128_x4_inc_ctx *state,
+	    const uint8_t *in0,
+	    const uint8_t *in1,
+	    const uint8_t *in2,
+	    const uint8_t *in3,
+	    size_t inlen);
+
+	void (*SHA3_shake128_x4_inc_finalize)(OQS_SHA3_shake128_x4_inc_ctx *state);
+
+	void (*SHA3_shake128_x4_inc_squeeze)(
+	    uint8_t *out0,
+	    uint8_t *out1,
+	    uint8_t *out2,
+	    uint8_t *out3,
+	    size_t outlen,
+	    OQS_SHA3_shake128_x4_inc_ctx *state);
+
+	void (*SHA3_shake128_x4_inc_ctx_release)(OQS_SHA3_shake128_x4_inc_ctx *state);
+
+	void (*SHA3_shake128_x4_inc_ctx_clone)(
+	    OQS_SHA3_shake128_x4_inc_ctx *dest,
+	    const OQS_SHA3_shake128_x4_inc_ctx *src);
+
+	void (*SHA3_shake128_x4_inc_ctx_reset)(OQS_SHA3_shake128_x4_inc_ctx *state);
+
+	void (*SHA3_shake256_x4)(
+	    uint8_t *out0,
+	    uint8_t *out1,
+	    uint8_t *out2,
+	    uint8_t *out3,
+	    size_t outlen,
+	    const uint8_t *in0,
+	    const uint8_t *in1,
+	    const uint8_t *in2,
+	    const uint8_t *in3,
+	    size_t inlen);
+
+	void (*SHA3_shake256_x4_inc_init)(OQS_SHA3_shake256_x4_inc_ctx *state);
+
+	void (*SHA3_shake256_x4_inc_absorb)(
+	    OQS_SHA3_shake256_x4_inc_ctx *state,
+	    const uint8_t *in0,
+	    const uint8_t *in1,
+	    const uint8_t *in2,
+	    const uint8_t *in3,
+	    size_t inlen);
+
+	void (*SHA3_shake256_x4_inc_finalize)(OQS_SHA3_shake256_x4_inc_ctx *state);
+
+	void (*SHA3_shake256_x4_inc_squeeze)(
+	    uint8_t *out0,
+	    uint8_t *out1,
+	    uint8_t *out2,
+	    uint8_t *out3,
+	    size_t outlen,
+	    OQS_SHA3_shake256_x4_inc_ctx *state);
+
+	void (*SHA3_shake256_x4_inc_ctx_release)(OQS_SHA3_shake256_x4_inc_ctx *state);
+
+	void (*SHA3_shake256_x4_inc_ctx_clone)(
+	    OQS_SHA3_shake256_x4_inc_ctx *dest,
+	    const OQS_SHA3_shake256_x4_inc_ctx *src);
+
+	void (*SHA3_shake256_x4_inc_ctx_reset)(OQS_SHA3_shake256_x4_inc_ctx *state);
+};
+
+/**
+ * Set callback functions for 4-parallel SHA3 operations.
+ *
+ * This function may be called at most once before OQS_init to replace
+ * the implementation of 4-parallel SHA3 operations.
+ *
+ * @param new_callbacks Callback functions defined in OQS_SHA3_x4_callbacks struct
+ */
+OQS_API void OQS_SHA3_x4_set_callbacks(struct OQS_SHA3_x4_callbacks *new_callbacks);
 
 #if defined(__cplusplus)
 } // extern "C"
