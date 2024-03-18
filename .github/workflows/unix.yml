@@ -218,3 +218,34 @@ jobs:
       - name: Run tests
         run: mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --ignore=tests/test_kat_all.py ${{ matrix.PYTEST_ARGS }}
         timeout-minutes: 60
+  
+  s390x_job:
+    needs: buildcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run commands
+        uses: uraimo/run-on-arch-action@v2
+        id: s390x_ci
+        with:
+          arch: s390x
+          distro: ubuntu22.04
+
+          install: |
+            apt -y update
+            apt -y install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz valgrind
+
+          # Set an output parameter `uname` for use in subsequent steps
+          run: |
+            uname -a
+            mkdir -p build && cd build && cmake -GNinja -DOQS_STRICT_WARNINGS=ON ${{ matrix.CMAKE_ARGS }} .. && cmake -LA ..
+            ninja
+            cd ..
+            mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --ignore=tests/test_kat_all.py ${{ matrix.PYTEST_ARGS }}
+            echo ::set-output name=uname::$(uname -a)
+
+      - name: Get the output
+        # Echo the `uname` output parameter from the `runcmd` step
+        run: |
+          echo "The uname output was ${{ steps.s390x_ci.outputs.uname }}"
