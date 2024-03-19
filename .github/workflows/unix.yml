@@ -234,7 +234,7 @@ jobs:
 
           install: |
             apt -y update
-            apt -y install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz valgrind
+            apt -y install astyle cmake gcc ninja-build libssl-dev python3-pytest python3-pytest-xdist unzip xsltproc doxygen graphviz python3-yaml valgrind
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
