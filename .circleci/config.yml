@@ -290,7 +290,7 @@ workflows:
           name: ubuntu-focal-clang15
           context: openquantumsafe
           CONTAINER: openquantumsafe/ci-ubuntu-focal-x86_64:latest
-          CMAKE_ARGS: -DOQS_STRICT_WARNINGS=ON -DCMAKE_C_COMPILER=clang-15 -DOQS_OPT_TARGET=skylake -DOQS_DIST_BUILD=OFF
+          CMAKE_ARGS: -DOQS_STRICT_WARNINGS=ON -DCMAKE_C_COMPILER=clang-15 -DOQS_OPT_TARGET=haswell -DOQS_DIST_BUILD=OFF
           PYTEST_ARGS: --ignore=tests/test_kat_all.py
       - linux_oqs:
           <<: *require_buildcheck
