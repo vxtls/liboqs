@@ -25,7 +25,7 @@ jobs:
       - name: Check that doxygen can parse the documentation
         run: mkdir build && ./scripts/run_doxygen.sh $(which doxygen) ./docs/.Doxyfile ./build
       - name: Install ajv # TODO move this into Dockerfile
-        run: npm -g install ajv ajv-cli
+        run: apt update && apt install npm && npm -g install ajv ajv-cli
       - name: Validate CBOM
         run: scripts/validate_cbom.sh
 
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install sudo # TODO move this into Dockerfile
-        run: apt update && apt install sudo
+        run: apt update && apt install sudo curl
       - name: Setup nix
         uses: cachix/install-nix-action@v26
       - name: Setup jasmin-compiler
