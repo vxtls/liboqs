@@ -24,6 +24,8 @@ jobs:
         run: python3 -m pytest --verbose tests/test_code_conventions.py
       - name: Check that doxygen can parse the documentation
         run: mkdir build && ./scripts/run_doxygen.sh $(which doxygen) ./docs/.Doxyfile ./build
+      - name: Install ajv # TODO move this into Dockerfile
+        run: npm -g install ajv ajv-cli
       - name: Validate CBOM
         run: scripts/validate_cbom.sh
 
@@ -38,6 +40,8 @@ jobs:
     container: openquantumsafe/ci-ubuntu-latest:latest
     runs-on: ubuntu-latest
     steps:
+      - name: Install sudo # TODO move this into Dockerfile
+        run: apt update && apt install sudo
       - name: Setup nix
         uses: cachix/install-nix-action@v26
       - name: Setup jasmin-compiler
