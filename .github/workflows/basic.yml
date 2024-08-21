@@ -97,6 +97,7 @@ jobs:
           - macos-12
           - macos-13
           - macos-14
+    runs-on: ${{ matrix.runner }}
     env:
       KEM_NAME: kyber_768
       SIG_NAME: dilithium_3
