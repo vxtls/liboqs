@@ -57,11 +57,11 @@ jobs:
       matrix:
         runner:
           - ubuntu-latest
-          - oqs-arm64
+            #- oqs-arm64
         container:
-          - openquantumsafe/ci-ubuntu-focal:latest
-          - openquantumsafe/ci-ubuntu-jammy:latest
-          - openquantumsafe/ci-ubuntu-noble:latest
+          - openquantumsafe/ci-ubuntu-focal-x86_64:latest
+            #- openquantumsafe/ci-ubuntu-jammy:latest
+            #- openquantumsafe/ci-ubuntu-noble:latest
     runs-on: ${{ matrix.runner }}
     container: ${{ matrix.container }}
     env:
