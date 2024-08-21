@@ -57,7 +57,7 @@ jobs:
           export LIBOQS_DIR=`pwd` && \
           git config --global --add safe.directory $LIBOQS_DIR && \
           cd scripts/copy_from_upstream && \
-          ! pip3 install --require-hashes -r requirements.txt 2>&1 | grep ERROR && \
+          ! pip3 install --require-hashes -r requirements.txt 2>&1 | grep -i ERROR && \
           python3 copy_from_upstream.py ${{ matrix.copy-mode }} && \
           ! git status | grep modified
 
