@@ -41,7 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install sudo # TODO move this into Dockerfile
-        run: apt-get update && apt-get install -y sudo curl
+        run: |
+          apt-get update && \
+          apt-get install -y sudo curl \
+          python3-attr python3-git python3-importlib-metadata \
+          python3-markdown-it python3-markupsafe python3-mdit-py-plugins python3-yaml python3-typing-extensions \
+          python3-wget python3-zipp
       - name: Setup nix
         uses: cachix/install-nix-action@v26
       - name: Setup jasmin-compiler
