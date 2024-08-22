@@ -114,6 +114,7 @@ jobs:
             PYTEST_ARGS: --ignore=tests/test_kat_all.py
           - name: noble-nodistbuild
             runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_DIST_BUILD=OFF
             PYTEST_ARGS: --ignore=tests/test_kat_all.py
           - name: noble-generic
