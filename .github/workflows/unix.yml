@@ -62,11 +62,6 @@ jobs:
     needs: [ stylecheck, upstreamcheck ]
     strategy:
       matrix:
-        libjade-build:
-          - -DOQS_LIBJADE_BUILD=OFF
-          # Restrict -DOQS_LIBJADE_BUILD=ON build to algs provided by
-          # libjade to minimise repeated tests
-          - -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST
         runner:
           - ubuntu-latest
             #- oqs-arm64
@@ -106,12 +101,26 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        libjade-build:
-          - -DOQS_LIBJADE_BUILD=OFF
-          # Restrict -DOQS_LIBJADE_BUILD=ON build to algs provided by
-          # libjade to minimise repeated tests
-          - -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST
         include:
+          - name: noble
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: noble-hazardous
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: noble-nodistbuild
+            runner: ubuntu-latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: noble-generic
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
           - name: arm64
             runner: oqs-arm64
             container: openquantumsafe/ci-ubuntu-focal-arm64:latest
@@ -189,7 +198,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # pin@v4
       - name: Configure
-        run: mkdir build && cd build && cmake -GNinja ${{ matrix.CMAKE_ARGS }} ${{ matrix.libjade-build }} .. && cmake -LA -N ..
+        run: mkdir build && cd build && cmake -GNinja ${{ matrix.CMAKE_ARGS }} .. && cmake -LA -N ..
       - name: Build
         run: ninja
         working-directory: build
