@@ -67,17 +67,15 @@ jobs:
           # Restrict -DOQS_LIBJADE_BUILD=ON build to algs provided by
           # libjade to minimise repeated tests
           - -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST
-        include:
-          - runner: oqs-arm64
-            container: openquantumsafe/ci-ubuntu-focal-arm64:latest
-          - runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-focal-x86_64:latest
-          - runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-jammy:latest
-          - runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-latest:latest
+        runner:
+          - ubuntu-latest
+          - oqs-arm64
+        distro:
+          - focal
+          - jammy
+          - noble
     runs-on: ${{ matrix.runner }}
-    container: ${{ matrix.container }}
+    container: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest
     env:
       KEM_NAME: kyber_768
       SIG_NAME: dilithium_3
