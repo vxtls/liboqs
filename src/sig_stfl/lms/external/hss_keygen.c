@@ -12,6 +12,7 @@
 #include "lm_ots_common.h"
 #include <oqs/oqsconfig.h>
 
+#ifdef OQS_ALLOW_LMS_KEY_AND_SIG_GEN
 /* Count the number of 1 bits at the end (lsbits) of the integer */
 /* Do it in the obvious way; straightline code may be faster (no */
 /* unpredictable jumps, which are costly), but that would be less scrutable */
@@ -52,7 +53,6 @@ static int trailing_1_bits(merkle_index_t n) {
  *
  * This returns true on success, false on failure
  */
-#ifdef OQS_ALLOW_LMS_KEY_AND_SIG_GEN
 bool hss_generate_private_key(
     bool (*generate_random)(void *output, size_t length),
     unsigned levels,
