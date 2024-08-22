@@ -69,11 +69,11 @@ jobs:
           - -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST
         runner:
           - ubuntu-latest
-          - oqs-arm64
+            #- oqs-arm64
         distro:
-          - focal
+          #- focal
           - jammy
-          - noble
+          - latest
     runs-on: ${{ matrix.runner }}
     container: openquantumsafe/ci-ubuntu-${{ matrix.distro }}:latest
     env:
