@@ -32,11 +32,13 @@ jobs:
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
             PYTEST_ARGS: --ignore=tests/test_kat_all.py
+            INCLUDE_ALGS: '^LMS(.)*,^XMSS(.)*'
           - name: noble-hazardous-clang
             runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DCMAKE_C_COMPILER=clang
             PYTEST_ARGS: --ignore=tests/test_kat_all.py
+            INCLUDE_ALGS: '^LMS(.)*,^XMSS(.)*'
               #          - name: noble-nodistbuild
               #            runner: ubuntu-latest
               #            container: openquantumsafe/ci-ubuntu-latest:latest
@@ -95,7 +97,7 @@ jobs:
         working-directory: build
       - name: Run tests
         timeout-minutes: 60
-        run: mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --numprocesses=auto ${{ matrix.PYTEST_ARGS }}
+        run: mkdir -p tmp && INCLUDE_ALGS='${{ matrix.INCLUDE_ALGS}}' python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --numprocesses=auto ${{ matrix.PYTEST_ARGS }}
       - name: Package .deb
         if: matrix.name == 'jammy-std-openssl3'
         run: cpack
