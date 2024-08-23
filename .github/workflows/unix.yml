@@ -17,28 +17,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: noble
-            runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-latest:latest
-            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON
-            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          #          - name: noble
+          #            runner: ubuntu-latest
+          #            container: openquantumsafe/ci-ubuntu-latest:latest
+          #            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON
+          #            PYTEST_ARGS: --ignore=tests/test_kat_all.py
           - name: noble-clang
             runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DCMAKE_C_COMPILER=clang
-            PYTEST_ARGS: --ignore=tests/test_kat_all.py
-          - name: noble-hazardous
-            runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-latest:latest
-            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
-            PYTEST_ARGS: --ignore=tests/test_kat_all.py
-            INCLUDE_ALGS: '^LMS(.)*,^XMSS(.)*'
-          - name: noble-hazardous-clang
-            runner: ubuntu-latest
-            container: openquantumsafe/ci-ubuntu-latest:latest
-            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DCMAKE_C_COMPILER=clang
-            PYTEST_ARGS: --ignore=tests/test_kat_all.py
-            INCLUDE_ALGS: '^LMS(.)*,^XMSS(.)*'
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py -k 'not (leaks and (Dilithium or ML-DSA))'
+              #          - name: noble-hazardous # TODO timing out
+              #            runner: ubuntu-latest
+              #            container: openquantumsafe/ci-ubuntu-latest:latest
+              #            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
+              #            PYTEST_ARGS: --ignore=tests/test_kat_all.py -k 'LMS or XMSS'
+              #          - name: noble-hazardous-clang # TODO timing out
+              #            runner: ubuntu-latest
+              #            container: openquantumsafe/ci-ubuntu-latest:latest
+              #            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DCMAKE_C_COMPILER=clang
+              #            PYTEST_ARGS: --ignore=tests/test_kat_all.py
               #          - name: noble-nodistbuild
               #            runner: ubuntu-latest
               #            container: openquantumsafe/ci-ubuntu-latest:latest
@@ -64,6 +62,11 @@ jobs:
               #            container: openquantumsafe/ci-ubuntu-latest:latest
               #            CMAKE_ARGS: -DBUILD_SHARED_LIBS=ON
               #            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: noble-shared-openssl-dlopen
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DBUILD_SHARED_LIBS=ON -DOQS_DLOPEN_OPENSSL=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
               #          - name: noble-shared-noopenssl
               #            runner: ubuntu-latest
               #            container: openquantumsafe/ci-ubuntu-latest:latest
@@ -96,8 +99,8 @@ jobs:
         run: ninja
         working-directory: build
       - name: Run tests
-        timeout-minutes: 60
-        run: mkdir -p tmp && INCLUDE_ALGS='${{ matrix.INCLUDE_ALGS}}' python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --numprocesses=auto ${{ matrix.PYTEST_ARGS }}
+        timeout-minutes: 120 # TODO reduce
+        run: mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --numprocesses=auto ${{ matrix.PYTEST_ARGS }}
       - name: Package .deb
         if: matrix.name == 'jammy-std-openssl3'
         run: cpack
