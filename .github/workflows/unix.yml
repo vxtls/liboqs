@@ -87,6 +87,76 @@ jobs:
               #            container: openquantumsafe/ci-ubuntu-latest:latest
               #            CMAKE_ARGS: -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
               #            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-clang
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DCMAKE_C_COMPILER=clang
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py -k 'not (leaks and (Dilithium or ML-DSA))'
+          - name: jammy-hazardous
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py -k 'LMS or XMSS'
+          - name: jammy-hazardous-clang
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DCMAKE_C_COMPILER=clang
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-nodistbuild
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-generic
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-noopenssl
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_USE_OPENSSL=OFF
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-openssl-sha3
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_USE_OPENSSL_SHA3=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-shared
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DBUILD_SHARED_LIBS=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-shared-openssl-dlopen
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DBUILD_SHARED_LIBS=ON -DOQS_DLOPEN_OPENSSL=ON
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-shared-noopenssl
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DBUILD_SHARED_LIBS=ON -DOQS_USE_OPENSSL=OFF
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-libjade
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-libjade-nodistbuild
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST -DOQS_DIST_BUILD=OFF
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
+          - name: jammy-libjade-generic
+            runner: ubuntu-latest
+            container: openquantumsafe/ci-ubuntu-jammy:latest
+            CMAKE_ARGS: -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD=$LIBJADE_ALG_LIST -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
+            PYTEST_ARGS: --ignore=tests/test_kat_all.py
     runs-on: ${{ matrix.runner }}
     container:
       image: ${{ matrix.container }}
