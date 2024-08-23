@@ -147,7 +147,15 @@ def filtered_test(func):
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        if ('SKIP_ALGS' in os.environ) and len(os.environ['SKIP_ALGS'])>0:
+        if ('INCLUDE_ALGS' in os.environ) and len(os.environ['INCLUDE_ALGS']) > 0:
+            for algexp in os.environ['INCLUDE_ALGS'].split(','):
+                if any([len(re.findall(algexp, arg)) > 0 for arg in args]):
+                    break
+                if any([len(re.findall(algexp, kwargs[arg])) > 0 for arg in kwargs]):
+                    break
+            else:
+                pytest.skip("Test disabled by alg filter")
+        elif ('SKIP_ALGS' in os.environ) and len(os.environ['SKIP_ALGS'])>0:
             for algexp in os.environ['SKIP_ALGS'].split(','):
                 for arg in args:
                     if len(re.findall(algexp, arg))>0:
