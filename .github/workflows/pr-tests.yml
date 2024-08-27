@@ -10,13 +10,13 @@ jobs:
     uses: ./.github/workflows/basic.yml
   android-tests:
     needs: basic-checks
-    uses: ./.github/workflow/android.yml
+    uses: ./.github/workflows/android.yml
   ios-tests:
     needs: basic-checks
-    uses: ./.github/workflow/apple.yml
+    uses: ./.github/workflows/apple.yml
   windows-tests:
     needs: basic-checks
-    uses: ./.github/workflow/windows.yml
+    uses: ./.github/workflows/windows.yml
   zephyr-tests:
     needs: basic-checks
-    uses: ./.github/workflow/zephyr.yml
+    uses: ./.github/workflows/zephyr.yml
