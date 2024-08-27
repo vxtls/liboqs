@@ -15,4 +15,4 @@ jobs:
     uses: ./.github/workflows/scorecard.yml
 
   extended-tests:
-    uses: ./.github/workflows/extended-tests.yml
+    uses: ./.github/workflows/extended.yml

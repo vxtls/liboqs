@@ -12,7 +12,7 @@ jobs:
 
   platform-tests:
     needs: basic-checks
-    uses: ./.github/workflows/platform-tests.yml
+    uses: ./.github/workflows/platforms.yml
 
   scorecard:
     needs: basic-checks

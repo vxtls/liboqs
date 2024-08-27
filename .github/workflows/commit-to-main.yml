@@ -10,7 +10,7 @@ on:
 jobs:
 
   platform-tests:
-    uses: ./.github/workflows/platform-tests.yml
+    uses: ./.github/workflows/platforms.yml
 
   scorecard:
     uses: ./.github/workflows/scorecard.yml
