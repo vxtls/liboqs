@@ -47,7 +47,7 @@ jobs:
 
   buildcheck:
     name: Check that code passes a basic build
-    needs: [ stylecheck, upstreamcheck ]
+      #needs: [ stylecheck, upstreamcheck ]
     runs-on: ubuntu-latest
     container: openquantumsafe/ci-ubuntu-latest:latest
     env:
