@@ -122,11 +122,11 @@ jobs:
           cmake -GNinja -DOQS_STRICT_WARNINGS=ON \
             -DCMAKE_C_COMPILER=${{ matrix.compiler }} \
             -DBUILD_SHARED_LIBS=${{ matrix.shared }} \
-            -DOQS_USE_OPENSSL=${{ matrix.openssl.use }} \
-            -DOQS_USE_SHA3_OPENSSL=${{ matrix.openssl.sha3 }} \
-            -DOQS_DLOPEN_OPENSSL=${{ matrix.openssl.dlopen }} \
-            -DOQS_DIST_BUILD=${{ matrix.target.dist }} \
-            -DOQS_OPT_TARGET=${{ matrix.target.opt }} \
+            -DOQS_USE_OPENSSL=${{ matrix.openssl }} \
+            -DOQS_USE_SHA3_OPENSSL=${{ matrix.sha3-openssl }} \
+            -DOQS_DLOPEN_OPENSSL=${{ matrix.dlopen }} \
+            -DOQS_DIST_BUILD=${{ matrix.dist-build }} \
+            -DOQS_OPT_TARGET=${{ matrix.opt-target }} \
             -DOQS_ENABLE_SIG_STFL_LMS=${{ matrix.stfl }} \
             -DOQS_ENABLE_SIG_STFL_XMSS=${{ matrix.stfl }} \
             -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=${{ matrix.stfl-hazardous }} \
