@@ -11,53 +11,42 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Generates 144 configs.
+        # Generates 256 configs.
         runner: [ubuntu-latest, oqs-arm64]
         compiler: [gcc, clang]
         shared: [ON, OFF]
-        openssl:
-          # off
-          - use: OFF
-            dlopen: OFF
-            sha3: OFF
-          # default
-          - use: ON
-            dlopen: OFF
-            sha3: OFF
-          # with dlopen and sha3
-          - use: ON
-            dlopen: ON
-            sha3: ON
-        target:
-          # default
-          - dist: ON
-            opt: auto
-          # generic
-          - dist: OFF
-            opt: generic
-          # non-portable
-          - dist: OFF
-            opt: auto
+        openssl: [ON, OFF]
+        sha3-openssl: [ON, OFF]
+        dist-build: [ON, OFF]
+        opt-target: [auto, generic]
         libjade: [ON, OFF]
-        exclude: # see https://github.com/actions/runner/issues/1512 for syntax explanation
+        exclude:
+          # OQS_OPT_TARGET is ignored when OQS_DIST_BUILD is ON.
+          # Excludes 64 configs, leaving 256 - 64 = 192 configs.
+          - dist-build: ON
+            opt-target: generic
+          # OQS_USE_SHA3_OPENSSL is ignored when OQS_USE_OPENSSL is OFF.
+          # Excludes 48 additional configs, leaving 192 - 48 = 144 configs.
+          - openssl: OFF
+            sha3-openssl: ON
           # OpenSSL linkage should be unaffected by OQS portable build settings.
           # Test the non-portable builds against OQS common code to ensure complete coverage.
           # Excludes 64 configs, leaving 144 - 64 = 80 configs.
-          - {target: {dist: OFF}}
-            {openssl: {use: ON}}
+          - dist-build: OFF
+            openssl: ON
           # Library type should also be unaffected by portable build settings.
           # Test the non-portable builds only for the default static library builds.
           # Excludes 16 additional configs, leaving 80 - 16 = 64 configs.
-          - {target: {dist: OFF}}
+          - dist-build: OFF
             shared: ON
-          # libjade only targets x86_64.
+          # libjade does not support arm.
           # Excludes 16 additional configs, leaving 64 - 16 = 48 configs.
-          - libjade: ON
-            runner: oqs-arm64
+          - runner: oqs-arm64
+            libjade: ON
           # libjade's common code is self-contained, so OpenSSL linkage is irrelevant.
           # Excludes 8 additional configs, leaving 48 - 8 = 40 configs.
           - libjade: ON
-            {openssl: {use: ON}}
+            openssl: ON
           # libjade doesn't link against external dependencies, so shared/static settings should
           # also be irrelevant. Test in a static build so that the portable build settings
           # (which are relevant) all get tested.
@@ -74,12 +63,19 @@ jobs:
           # Set additional build options to empty by default.
           # Extends all existing configs.
           - build-options: ''
+          # Disable dynamic loading of libcrypto by default.
+          # Extends all existing configs.
+          - dlopen: OFF
+          # Test OQS_DLOPEN_OPENSSL whenever OQS_USE_SHA3_OPENSSL is tested.
+          # Overwrites 8 existing configs.
+          - sha3-openssl: ON
+            dlopen: ON
           # Test stateful sigs without hazardous ops. The stateful signature code is purely generic,
           # so it should be independent of portable build settings.
           # It's also independent of libjade.
           # Overwrites 4 existing configs.
-          - target.dist: OFF
-            target.opt: generic
+          - dist-build: OFF
+            opt-target: generic
             libjade: OFF
             stfl: ON
           # Test stateful sigs with hazardous ops. The stateful signature code is purely generic,
@@ -87,8 +83,8 @@ jobs:
           # It's also independent of libjade.
           # We can't use "generic" again, as it would overwrite the previous "include" job.
           # Overwrites 4 existing configs.
-          - target.dist: OFF
-            target.opt: auto
+          - dist-build: OFF
+            opt-target: auto
             libjade: OFF
             stfl: ON
             stfl-hazardous: ON
@@ -101,16 +97,16 @@ jobs:
           # USE_SHA3_OPENSSL builds to these algs (and those run slower, so it's better
           # to test with fewer algs anyway).
           # Overwrites 4 existing configs.
-          - openssl.sha3: ON
+          - sha3-openssl: ON
             compiler: gcc
             build-options: -DOQS_ALGS_ENABLED=STD
           # Overwrites 2 existing configs.
-          - openssl.sha3: ON
+          - sha3-openssl: ON
             compiler: clang
             shared: ON
             build-options: -DOQS_ALGS_ENABLED=NIST_R4
           # Overwrites 2 existing config.
-          - openssl.sha3: ON
+          - sha3-openssl: ON
             compiler: clang
             shared: OFF
             build-options: -DOQS_ALGS_ENABLED=NIST_SIG_ONRAMP
