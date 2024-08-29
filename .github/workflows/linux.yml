@@ -11,22 +11,109 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # total of 38 test runs here.
+        # Generates 144 configs.
         runner: [ubuntu-latest, oqs-arm64]
-        # Test all combinations of the following options.
-        # Generates 16 base test runs (4 on arm, 4 on x86_64).
         compiler: [gcc, clang]
         shared: [ON, OFF]
-        openssl: [ON, OFF]
-        # Default values to be overridden selectively
-        sha3-openssl: [OFF]
-        dlopen-openssl: [OFF]
-        dist-build: [ON]
-        opt-target: [auto]
-        stfl: [OFF]
-        stfl-keygen: [OFF]
-        libjade: [OFF]
-        build-options: ['']
+        openssl:
+          # off
+          - use: OFF
+            dlopen: OFF
+            sha3: OFF
+          # default
+          - use: ON
+            dlopen: OFF
+            sha3: OFF
+          # with dlopen and sha3
+          - use: ON
+            dlopen: ON
+            sha3: ON
+        target:
+          # default
+          - dist: ON
+            opt: auto
+          # generic
+          - dist: OFF
+            opt: generic
+          # non-portable
+          - dist: OFF
+            opt: auto
+        libjade: [ON, OFF]
+        exclude: # trim down
+          # OpenSSL linkage should be unaffected by OQS portable build settings.
+          # Test the non-portable builds against OQS common code to ensure complete coverage.
+          # Excludes 64 configs, leaving 144 - 64 = 80 configs.
+          - target.dist: OFF
+            openssl.use: ON
+          # Library type should also be unaffected by portable build settings.
+          # Test the non-portable builds only for the default static library builds.
+          # Excludes 16 additional configs, leaving 80 - 16 = 64 configs.
+          - target.dist: OFF
+            shared: ON
+          # libjade only targets x86_64.
+          # Excludes 16 additional configs, leaving 64 - 16 = 48 configs.
+          - libjade: ON
+            runner: oqs-arm64
+          # libjade's common code is self-contained, so OpenSSL linkage is irrelevant.
+          # Excludes 8 additional configs, leaving 48 - 8 = 40 configs.
+          - libjade: ON
+            openssl.use: ON
+          # libjade doesn't link against external dependencies, so shared/static settings should
+          # also be irrelevant. Test in a static build so that the portable build settings
+          # (which are relevant) all get tested.
+          # Excludes 2 additional configs, leaving 40 - 2 = 38 configs.
+          - libjade: ON
+            shared: ON
+        include:
+          # Disable stateful sigs by default.
+          # Extends all existing configs.
+          - stfl: OFF
+          # Disable hazardous stateful sig operations by default.
+          # Extends all existing configs.
+          - stfl-hazardous: OFF
+          # Set additional build options to empty by default.
+          # Extends all existing configs.
+          - build-options: ''
+          # Test stateful sigs without hazardous ops. The stateful signature code is purely generic,
+          # so it should be independent of portable build settings.
+          # It's also independent of libjade.
+          # Overwrites 4 existing configs.
+          - target.dist: OFF
+            target.opt: generic
+            libjade: OFF
+            stfl: ON
+          # Test stateful sigs with hazardous ops. The stateful signature code is purely generic,
+          # so it should be independent of portable build settings.
+          # It's also independent of libjade.
+          # We can't use "generic" again, as it would overwrite the previous "include" job.
+          # Overwrites 4 existing configs.
+          - target.dist: OFF
+            target.opt: auto
+            libjade: OFF
+            stfl: ON
+            stfl-hazardous: ON
+          # Only build supported algs for libjade builds.
+          # Overwrites 6 existing configs.
+          - libjade: ON
+            build-options: -DOQS_MINIMAL_BUILD="${{ vars.LIBJADE_ALG_LIST }}"
+          # Test out the different options for ALGS_ENABLED.
+          # All of them enable algorithms that use SHA3, so it won't do any harm to limit the 
+          # USE_SHA3_OPENSSL builds to these algs (and those run slower, so it's better
+          # to test with fewer algs anyway).
+          # Overwrites 4 existing configs.
+          - openssl.sha3: ON
+            compiler: gcc
+            build-options: -DOQS_ALGS_ENABLED=STD
+          # Overwrites 2 existing configs.
+          - openssl.sha3: ON
+            compiler: clang
+            shared: ON
+            build-options: -DOQS_ALGS_ENABLED=NIST_R4
+          # Overwrites 2 existing config.
+          - openssl.sha3: ON
+            compiler: clang
+            shared: OFF
+            build-options: -DOQS_ALGS_ENABLED=NIST_SIG_ONRAMP
     runs-on: ${{ matrix.runner }}
     container:
       image: openquantumsafe/ci-ubuntu-latest:latest
@@ -39,15 +126,14 @@ jobs:
           cmake -GNinja -DOQS_STRICT_WARNINGS=ON \
             -DCMAKE_C_COMPILER=${{ matrix.compiler }} \
             -DBUILD_SHARED_LIBS=${{ matrix.shared }} \
-            -DOQS_USE_OPENSSL=${{ matrix.openssl }} \
-            -DOQS_USE_SHA3_OPENSSL=${{ matrix.sha3-openssl }} \
-            -DOQS_DLOPEN_OPENSSL=${{ matrix.dlopen-openssl }} \
-            -DOQS_DIST_BUILD=${{ matrix.dist-build }} \
-            -DOQS_OPT_TARGET=${{ matrix.opt-target }} \
-            -DOQS_OPT_TARGET=${{ matrix.opt-target }} \
+            -DOQS_USE_OPENSSL=${{ matrix.openssl.use }} \
+            -DOQS_USE_SHA3_OPENSSL=${{ matrix.openssl.sha3 }} \
+            -DOQS_DLOPEN_OPENSSL=${{ matrix.openssl.dlopen }} \
+            -DOQS_DIST_BUILD=${{ matrix.target.dist }} \
+            -DOQS_OPT_TARGET=${{ matrix.target.opt }} \
             -DOQS_ENABLE_SIG_STFL_LMS=${{ matrix.stfl }} \
             -DOQS_ENABLE_SIG_STFL_XMSS=${{ matrix.stfl }} \
-            -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=${{ matrix.stfl-keygen }} \
+            -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=${{ matrix.stfl-hazardous }} \
             -DOQS_LIBJADE_BUILD=${{ matrix.libjade }} \
             ${{ matrix.build-options }} .. && \
           cmake -LA -N ..
