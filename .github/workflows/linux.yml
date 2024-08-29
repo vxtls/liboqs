@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         # total of 38 test runs here.
-        runner: [ubuntu-latest] # TODO add arm64
+        runner: [ubuntu-latest, oqs-arm64]
         # Test all combinations of the following options.
         # Generates 16 base test runs (4 on arm, 4 on x86_64).
         compiler: [gcc, clang]
@@ -27,74 +27,6 @@ jobs:
         stfl-keygen: [OFF]
         libjade: [OFF]
         build-options: ['']
-        include:
-          # Test the OpenSSL SHA3 implementation.
-          # It suffices to build only standards-track algs, as these rely heavily on SHA3.
-          # Generates 4 additional test runs (2 on arm, 2 on x86_64).
-          - shared: ON
-            openssl: ON
-            sha3-openssl: ON
-            build-options: -DOQS_ALGS_ENABLED=STD
-          # Test dynamic loading of libcrypto.
-          # Since we're primarily testing build-time behaviour, only build the on-ramp candidates.
-          # Generates 4 additional test runs (2 on arm, 2 on x86_64).
-          - shared: ON
-            openssl: ON
-            dlopen-ssl: OFF
-            build-options: -DOQS_ALGS_ENABLED=NIST_SIG_ONRAMP
-          # Test the "generic" code without DIST_BUILD.
-          # Do it without OpenSSL so that the generic common code gets tested too.
-          # Stateful sigs code is all generic, so additionally test it out here (without keygen).
-          # Generates 4 additional test runs (2 on arm, 2 on x86_64).
-          - shared: OFF
-            openssl: OFF
-            dist-build: OFF
-            opt-target: generic
-            stfl: ON
-            stfl-keygen: OFF
-          # Test the code without runtime feature detection.
-          # Do it without OpenSSL for the same reasons as above.
-          # Shared vs static doesn't really matter here, so just pick the opposite of the
-          # "generic" run to have more coverage.
-          # Test stateful sigs keygen here. We could also do it in the "generic" run, but the
-          # non-stateful tests will complete faster in this run, so total runtime will be lower
-          # if it's tested here.
-          # Generates 4 additional test runs (2 on arm, 2 on x86_64).
-          - shared: ON
-            openssl: OFF
-            dist-build: OFF
-            opt-target: auto
-            stfl: ON
-            stfl-keygen: ON
-          # Test the libjade implementation.
-          # libjade is not supported on arm.
-          # Static/shared/OpenSSL shouldn't matter here.
-          # Only build the algorithms supported by libjade.
-          # Generates 2 additional test runs (x86_64 only).
-          - runner: ubuntu-latest
-            shared: OFF
-            openssl: ON
-            libjade: ON
-            build-options: -DOQS_MINIMAL_BUILD="${{ vars.LIBJADE_ALG_LIST }}"
-          # Test the "generic" libjade implementation.
-          # Generates 2 additional test runs (x86_64 only).
-          - runner: ubuntu-latest
-            shared: ON
-            openssl: OFF
-            dist-build: OFF
-            opt-target: generic
-            libjade: ON
-            build-options: -DOQS_MINIMAL_BUILD="${{ vars.LIBJADE_ALG_LIST }}"
-          # Test the libjade implementation without runtime feature detection.
-          # Generates 2 additional test runs (x86_64 only).
-          - runner: ubuntu-latest
-            shared: OFF
-            openssl: OFF
-            dist-build: OFF
-            opt-target: auto
-            libjade: ON
-            build-options: -DOQS_MINIMAL_BUILD="${{ vars.LIBJADE_ALG_LIST }}"
-
     runs-on: ${{ matrix.runner }}
     container:
       image: openquantumsafe/ci-ubuntu-latest:latest
