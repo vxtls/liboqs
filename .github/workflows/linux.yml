@@ -39,16 +39,16 @@ jobs:
           - dist: OFF
             opt: auto
         libjade: [ON, OFF]
-        exclude: # trim down
+        exclude: # see https://github.com/actions/runner/issues/1512 for syntax explanation
           # OpenSSL linkage should be unaffected by OQS portable build settings.
           # Test the non-portable builds against OQS common code to ensure complete coverage.
           # Excludes 64 configs, leaving 144 - 64 = 80 configs.
-          - target.dist: OFF
-            openssl.use: ON
+          - {target: {dist: OFF}}
+            {openssl: {use: ON}}
           # Library type should also be unaffected by portable build settings.
           # Test the non-portable builds only for the default static library builds.
           # Excludes 16 additional configs, leaving 80 - 16 = 64 configs.
-          - target.dist: OFF
+          - {target: {dist: OFF}}
             shared: ON
           # libjade only targets x86_64.
           # Excludes 16 additional configs, leaving 64 - 16 = 48 configs.
@@ -57,7 +57,7 @@ jobs:
           # libjade's common code is self-contained, so OpenSSL linkage is irrelevant.
           # Excludes 8 additional configs, leaving 48 - 8 = 40 configs.
           - libjade: ON
-            openssl.use: ON
+            {openssl: {use: ON}}
           # libjade doesn't link against external dependencies, so shared/static settings should
           # also be irrelevant. Test in a static build so that the portable build settings
           # (which are relevant) all get tested.
