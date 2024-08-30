@@ -15,12 +15,14 @@
 /* Count the number of 1 bits at the end (lsbits) of the integer */
 /* Do it in the obvious way; straightline code may be faster (no */
 /* unpredictable jumps, which are costly), but that would be less scrutable */
+#ifdef OQS_ALLOW_LMS_KEY_AND_SIG_GEN
 static int trailing_1_bits(merkle_index_t n) {
     int i;
     for (i=0; n&1; n>>=1, i++)
         ;
     return i;
 }
+#endif // OQS_ALLOW_LMS_KEY_AND_SIG_GEN
 
 /*
  * This creates a private key (and the correspond public key, and optionally
@@ -358,7 +360,7 @@ bool hss_generate_private_key(
     free(temp_buffer); // IGNORE free-check
     return true;
 }
-#endif
+#endif // OQS_ALLOW_LMS_KEY_AND_SIG_GEN
 
 /*
  * The length of the private key
