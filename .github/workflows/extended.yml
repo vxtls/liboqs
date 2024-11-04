@@ -7,22 +7,36 @@ on: [workflow_call, workflow_dispatch]
 
 jobs:
 
-  constant-time-x64:
-    runs-on: ubuntu-latest
+  constant-time:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: generic
+          - name: generic-x64
+            runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic -DCMAKE_BUILD_TYPE=Debug -DOQS_ENABLE_TEST_CONSTANT_TIME=ON
             PYTEST_ARGS: --numprocesses=auto -k 'test_constant_time'
             SKIP_ALGS: 'SPHINCS\+-SHA(.)*s-simple,SPHINCS\+-SHAKE-(.)*'
-          - name: extensions
+          - name: extensions-x64
+            runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=auto -DCMAKE_BUILD_TYPE=Debug -DOQS_ENABLE_TEST_CONSTANT_TIME=ON
             PYTEST_ARGS: --numprocesses=auto -k 'test_constant_time'
             SKIP_ALGS: 'SPHINCS\+-SHA(.)*s-simple,SPHINCS\+-SHAKE-(.)*'
+          - name: generic-arm64
+            runner: oqs-arm64
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic -DCMAKE_BUILD_TYPE=Debug -DOQS_ENABLE_TEST_CONSTANT_TIME=ON
+            PYTEST_ARGS: --numprocesses=auto -k 'test_constant_time'
+            SKIP_ALGS: 'SPHINCS\+-SHA(.)*s-simple,SPHINCS\+-SHAKE-(.)*'
+          - name: extensions-arm64
+            runner: oqs-arm64
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=auto -DCMAKE_BUILD_TYPE=Debug -DOQS_ENABLE_TEST_CONSTANT_TIME=ON
+            PYTEST_ARGS: --numprocesses=auto -k 'test_constant_time'
+            SKIP_ALGS: 'SPHINCS\+-SHA(.)*s-simple,SPHINCS\+-SHAKE-(.)*'
+    runs-on: ${{ matrix.runner }}
     container:
       image: ${{ matrix.container }}
     steps:
@@ -37,13 +51,13 @@ jobs:
         timeout-minutes: 360
         run: mkdir -p tmp && SKIP_ALGS='${{ matrix.SKIP_ALGS }}' python3 -m pytest --verbose ${{ matrix.PYTEST_ARGS }}
 
-  nistkat-x64:
-    runs-on: ubuntu-latest
+  nistkat:
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: generic
+          - name: generic-x64
+            runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
             PYTEST_ARGS: --numprocesses=auto -k 'test_kat_all'
@@ -59,6 +73,17 @@ jobs:
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=auto -DOQS_LIBJADE_BUILD=ON -DOQS_MINIMAL_BUILD="${{ vars.LIBJADE_ALG_LIST}}"
             PYTEST_ARGS: --numprocesses=auto -k 'test_kat_all'
+          - name: generic-arm64
+            runner: oqs-arm64
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic
+            PYTEST_ARGS: --numprocesses=auto -k 'test_kat_all'
+          - name: extensions-arm64
+            runner: oqs-arm64
+            container: openquantumsafe/ci-ubuntu-latest:latest
+            CMAKE_ARGS: -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=auto
+            PYTEST_ARGS: --numprocesses=auto -k 'test_kat_all'
+    runs-on: ${{ matrix.runner }}
     container:
       image: ${{ matrix.container }}
     steps:
