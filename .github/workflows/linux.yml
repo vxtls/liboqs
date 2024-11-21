@@ -15,13 +15,13 @@ jobs:
           - name: arm64
             runner: oqs-arm64
             container: openquantumsafe/ci-ubuntu-latest:latest
-            PYTEST_ARGS: --maxprocesses=10 --ignore=tests/test_kat_all.py
+            PYTEST_ARGS: --maxprocesses=10 --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
             CMAKE_ARGS: -DOQS_ENABLE_SIG_STFL_LMS=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON
           - name: alpine
             runner: ubuntu-latest
             container: openquantumsafe/ci-alpine-amd64:latest
             CMAKE_ARGS: -DOQS_STRICT_WARNINGS=ON -DOQS_USE_OPENSSL=ON -DBUILD_SHARED_LIBS=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON
-            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py
+            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
           - name: alpine-libjade
             runner: ubuntu-latest
             container: openquantumsafe/ci-alpine-amd64:latest
@@ -36,12 +36,12 @@ jobs:
             runner: ubuntu-latest
             container: openquantumsafe/ci-alpine-amd64:latest
             CMAKE_ARGS: -DOQS_STRICT_WARNINGS=ON -DOQS_USE_OPENSSL=ON -DBUILD_SHARED_LIBS=ON -DOQS_USE_AES_OPENSSL=ON -DOQS_USE_SHA2_OPENSSL=ON -DOQS_USE_SHA3_OPENSSL=ON -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON
-            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py
+            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
           - name: alpine-noopenssl
             runner: ubuntu-latest
             container: openquantumsafe/ci-alpine-amd64:latest
             CMAKE_ARGS: -DOQS_STRICT_WARNINGS=ON -DOQS_USE_OPENSSL=OFF -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON
-            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py
+            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
           - name: noble-nistr4-openssl
             runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
@@ -101,7 +101,7 @@ jobs:
             runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
             CMAKE_ARGS: -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Debug -DUSE_SANITIZER=Address -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON
-            PYTEST_ARGS: --ignore=tests/test_distbuild.py --ignore=tests/test_leaks.py --ignore=tests/test_kat_all.py --maxprocesses=10
+            PYTEST_ARGS: --ignore=tests/test_distbuild.py --ignore=tests/test_leaks.py --ignore=tests/test_kat_all.py --maxprocesses=10 -k 'not (speed and (LMS or XMSS))'
           - name: address-sanitizer-no-stfl-key-sig-gen
             runner: ubuntu-latest
             container: openquantumsafe/ci-ubuntu-latest:latest
@@ -150,7 +150,7 @@ jobs:
           - name: armhf
             ARCH: armhf
             CMAKE_ARGS: -DOQS_ENABLE_SIG_SPHINCS=OFF -DOQS_USE_OPENSSL=OFF -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=ON -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON
-            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py
+            PYTEST_ARGS: --ignore=tests/test_alg_info.py --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
           - name: armhf-no-stfl-key-sig-gen
             ARCH: armhf
             CMAKE_ARGS: -DOQS_ENABLE_SIG_SPHINCS=OFF -DOQS_USE_OPENSSL=OFF -DOQS_DIST_BUILD=OFF -DOQS_OPT_TARGET=generic -DOQS_HAZARDOUS_EXPERIMENTAL_ENABLE_SIG_STFL_KEY_SIG_GEN=OFF -DOQS_ENABLE_SIG_STFL_XMSS=ON -DOQS_ENABLE_SIG_STFL_LMS=ON

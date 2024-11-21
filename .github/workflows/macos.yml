@@ -53,5 +53,5 @@ jobs:
         run: ninja
         working-directory: build
       - name: Run tests
-        run: mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --ignore=tests/test_kat_all.py
+        run: mkdir -p tmp && python3 -m pytest --verbose --ignore=tests/test_code_conventions.py --ignore=tests/test_kat_all.py -k 'not (speed and (LMS or XMSS))'
         timeout-minutes: 60
